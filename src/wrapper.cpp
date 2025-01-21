@@ -1,49 +1,15 @@
 
 #include "wrapper.h"
+
+#define SIGNALSMITH_STRETCH_IMPLEMENTATION
 #include <signalsmith-stretch.h>
 
 #include <stddef.h>
 #include <vector>
 #include <cstring>
 
-// Allows channel-major indexing into interleaved buffers.
-class InterleavedBuffer {
-    float *data;
-    int channelCount;
-
-public:
-    InterleavedBuffer(float *data, int channels)
-        : data(data), channelCount(channels) {}
-
-    class ChannelView {
-        float *data;
-        int channel;
-        int stride;
-
-    public:
-        ChannelView(float *data, int channel, int stride)
-            : data(data), channel(channel), stride(stride) {}
-
-        float &operator[](size_t offset) {
-            return data[(offset * stride) + channel];
-        }
-
-        const float &operator[](size_t offset) const {
-            return data[(offset * stride) + channel];
-        }
-    };
-
-    ChannelView operator[](size_t channel) {
-        if (channel >= static_cast<size_t>(channelCount)) {
-            throw std::out_of_range("Channel index out of range");
-        }
-
-        return ChannelView(data, channel, channelCount);
-    }
-};
-
 struct signalsmith_stretch {
-    signalsmith::stretch::SignalsmithStretch<float> instance;
+    signalsmith::stretch::SignalsmithStretch instance;
     int channel_count;
 };
 
@@ -96,22 +62,16 @@ void signalsmith_stretch_set_transpose_factor_semitones(signalsmith_stretch_t *h
 }
 
 void signalsmith_stretch_seek(signalsmith_stretch_t *handle, float *input, size_t input_length, double playback_rate) {
-    InterleavedBuffer interleaved(input, handle->channel_count);
-    handle->instance.seek(interleaved, input_length, playback_rate);
+    handle->instance.seek(input, input_length, playback_rate);
 }
 
 void signalsmith_stretch_process(signalsmith_stretch_t *handle,
                                  float *input, size_t input_length,
                                  float *output, size_t output_length) {
-    InterleavedBuffer interleavedInput(input, handle->channel_count);
-    InterleavedBuffer interleavedOutput(output, handle->channel_count);
-
-    handle->instance.process(interleavedInput, input_length, interleavedOutput, output_length);
+    handle->instance.process(input, input_length, output, output_length);
 }
 
 void signalsmith_stretch_flush(signalsmith_stretch_t *handle,
                                float *output, size_t output_length) {
-    InterleavedBuffer interleavedOutput(output, handle->channel_count);
-
-    handle->instance.flush(interleavedOutput, output_length);
+    handle->instance.flush(output, output_length);
 }
