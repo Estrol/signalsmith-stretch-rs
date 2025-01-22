@@ -115,6 +115,23 @@ impl Stretch {
         }
     }
 
+    pub fn seek_raw(&mut self, input: impl AsRef<[f32]>, frame_count: usize, playback_rate: f64)
+    {
+        let input = input.as_ref();
+        let ptr = input.as_ptr();
+
+        debug_assert_eq!(0, input.len() % self.channel_count);
+
+        unsafe {
+            sys::signalsmith_stretch_seek(
+                self.inner,
+                ptr as _,
+                frame_count,
+                playback_rate,
+            );
+        }
+    }
+
     /// Add input to the stream, and get output. The length of input and output
     /// may differ, which will create a time-stretch effect.
     ///
@@ -138,6 +155,24 @@ impl Stretch {
         }
     }
 
+    pub fn process_raw(&mut self, input: impl AsRef<[f32]>, frame_count: usize, mut output: impl AsMut<[f32]>, output_frame_count: usize) {
+        let input = input.as_ref();
+        let output = output.as_mut();
+
+        debug_assert_eq!(0, input.len() % self.channel_count);
+        debug_assert_eq!(0, output.len() % self.channel_count);
+
+        unsafe {
+            sys::signalsmith_stretch_process(
+                self.inner,
+                input.as_ptr() as _,
+                frame_count,
+                output.as_mut_ptr(),
+                output_frame_count,
+            );
+        }
+    }
+
     /// Flush remaining output from the decoder. Use [Self::output_latency] to
     /// determine the correct length of the output buffer.
     pub fn flush(&mut self, mut output: impl AsMut<[f32]>) {
@@ -149,6 +184,19 @@ impl Stretch {
                 self.inner,
                 output.as_mut_ptr(),
                 output.len() / self.channel_count,
+            );
+        }
+    }
+
+    pub fn flush_raw(&mut self, mut output: impl AsMut<[f32]>, frame_count: usize) {
+        let output = output.as_mut();
+        debug_assert_eq!(0, output.len() % self.channel_count);
+
+        unsafe {
+            sys::signalsmith_stretch_flush(
+                self.inner,
+                output.as_mut_ptr(),
+                frame_count,
             );
         }
     }
