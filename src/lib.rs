@@ -120,7 +120,7 @@ impl Stretch {
         let input = input.as_ref();
         let ptr = input.as_ptr();
 
-        debug_assert_eq!(0, input.len() % self.channel_count);
+        debug_assert_eq!(0, frame_count % self.channel_count);
 
         unsafe {
             sys::signalsmith_stretch_seek(
@@ -159,8 +159,8 @@ impl Stretch {
         let input = input.as_ref();
         let output = output.as_mut();
 
-        debug_assert_eq!(0, input.len() % self.channel_count);
-        debug_assert_eq!(0, output.len() % self.channel_count);
+        debug_assert_eq!(0, frame_count % self.channel_count);
+        debug_assert_eq!(0, output_frame_count % self.channel_count);
 
         unsafe {
             sys::signalsmith_stretch_process(
@@ -190,7 +190,7 @@ impl Stretch {
 
     pub fn flush_raw(&mut self, mut output: impl AsMut<[f32]>, frame_count: usize) {
         let output = output.as_mut();
-        debug_assert_eq!(0, output.len() % self.channel_count);
+        debug_assert_eq!(0, frame_count % self.channel_count);
 
         unsafe {
             sys::signalsmith_stretch_flush(
