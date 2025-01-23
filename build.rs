@@ -12,6 +12,8 @@ fn main() {
         .file(src_path.join("wrapper.cpp"))
         .include(Path::new("signalsmith-stretch"))
         .cpp(true)
+        .flag_if_supported("-O3")
+        .flag_if_supported("-ffast-math")
         .compile("signalsmith-stretch");
 
     let bindings = bindgen::Builder::default()
