@@ -103,7 +103,8 @@ impl Stretch {
         let input = input.as_ref();
         let ptr = input.as_ptr();
 
-        debug_assert_eq!(0, input.len() % self.channel_count);
+        // Some sample rate like 44100 will have a frame count of 441, which is not divisible by common channel counts like 2 or 4.
+        // debug_assert_eq!(0, input.len() % self.channel_count);
 
         unsafe {
             sys::signalsmith_stretch_seek(
@@ -120,7 +121,8 @@ impl Stretch {
         let input = input.as_ref();
         let ptr = input.as_ptr();
 
-        debug_assert_eq!(0, frame_count % self.channel_count);
+        // Some sample rate like 44100 will have a frame count of 441, which is not divisible by common channel counts like 2 or 4.
+        // debug_assert_eq!(0, frame_count % self.channel_count);
 
         unsafe {
             sys::signalsmith_stretch_seek(
@@ -141,8 +143,9 @@ impl Stretch {
         let input = input.as_ref();
         let output = output.as_mut();
 
-        debug_assert_eq!(0, input.len() % self.channel_count);
-        debug_assert_eq!(0, output.len() % self.channel_count);
+        // Some sample rate like 44100 will have a frame count of 441, which is not divisible by common channel counts like 2 or 4.
+        // debug_assert_eq!(0, input.len() % self.channel_count);
+        // debug_assert_eq!(0, output.len() % self.channel_count);
 
         unsafe {
             sys::signalsmith_stretch_process(
@@ -159,8 +162,9 @@ impl Stretch {
         let input = input.as_ref();
         let output = output.as_mut();
 
-        debug_assert_eq!(0, frame_count % self.channel_count);
-        debug_assert_eq!(0, output_frame_count % self.channel_count);
+        // Some sample rate like 44100 will have a frame count of 441, which is not divisible by common channel counts like 2 or 4.
+        // debug_assert_eq!(0, frame_count % self.channel_count);
+        // debug_assert_eq!(0, output_frame_count % self.channel_count);
 
         unsafe {
             sys::signalsmith_stretch_process(
