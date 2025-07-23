@@ -1,16 +1,16 @@
 [package]
-name = "signalsmith-stretch"
-description = "A wrapper for the Signalsmith Stretch timestretch and pitch-shifting algorithm"
-version = "0.1.1"
-edition = "2021"
-authors = ["Colin Marc <hi@colinmarc.com>"]
+name = "estaudio-fork-signalsmith-stretch"
+description = "A custom fork of signalsmith-stretch-rs that use my own fork of signalsmith for audio processing."
+version = "0.1.5"
+edition = "2024"
+authors = ["Colin Marc <hi@colinmarc.com>", "Estrol Mendex <estrol@estrol.dev>"]
 license = "MIT"
 
 [dependencies]
 dasp = "0.11"
 
 [build-dependencies]
-bindgen = "0.70"
+bindgen = "0.72"
 cc = "1"
 
 [dev-dependencies]
