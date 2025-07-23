@@ -7,10 +7,45 @@ mod sys {
     include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 }
 
+/// Provide a way to track clone initialization type.
+/// This is used to ensure that the correct C API function is called when cloning
+#[derive(Debug, Clone)]
+enum InitType {
+    New(u32, usize, usize),
+    PresetDefault(u32, u32),
+    PresetCheaper(u32, u32),
+}
+
 /// Provides time stretching and/or pitch shifting for audio.
+#[derive(Debug)]
 pub struct Stretch {
     inner: *mut sys::signalsmith_stretch_t,
     channel_count: usize,
+    init_type: InitType,
+}
+
+impl Clone for Stretch {
+    fn clone(&self) -> Self {
+        let ptr = unsafe {
+            match self.init_type {
+                InitType::New(channel_count, block_length, interval) => {
+                    sys::signalsmith_stretch_create(channel_count as _, block_length, interval)
+                }
+                InitType::PresetDefault(channel_count, sample_rate) => {
+                    sys::signalsmith_stretch_create_preset_default(channel_count as i32, sample_rate as f32)
+                }
+                InitType::PresetCheaper(channel_count, sample_rate) => {
+                    sys::signalsmith_stretch_create_preset_cheaper(channel_count as i32, sample_rate as f32)
+                }
+            }
+        };
+
+        Stretch {
+            inner: ptr,
+            channel_count: self.channel_count,
+            init_type: self.init_type.clone(),
+        }
+    }
 }
 
 unsafe impl Send for Stretch {}
@@ -26,6 +61,7 @@ impl Stretch {
         Self {
             inner: ptr,
             channel_count: channel_count as usize,
+            init_type: InitType::New(channel_count, block_length, interval),
         }
     }
 
@@ -38,6 +74,7 @@ impl Stretch {
         Self {
             inner: ptr,
             channel_count: channel_count as usize,
+            init_type: InitType::PresetDefault(channel_count, sample_rate),
         }
     }
 
@@ -51,6 +88,7 @@ impl Stretch {
         Self {
             inner: ptr,
             channel_count: channel_count as usize,
+            init_type: InitType::PresetCheaper(channel_count, sample_rate),
         }
     }
 
