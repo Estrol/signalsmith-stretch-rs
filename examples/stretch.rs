@@ -84,7 +84,7 @@ where
 
     let sample_rate = output_config.sample_rate.0;
     let channels = output_config.channels;
-    let mut stretch = signalsmith_stretch::Stretch::preset_default(channels as u32, sample_rate);
+    let mut stretch = est_audio_fork_signalsmith_stretch::Stretch::preset_default(channels as u32, sample_rate);
     stretch.set_transpose_factor_semitones(semitones, None);
 
     let mut input_buffer = Vec::new();

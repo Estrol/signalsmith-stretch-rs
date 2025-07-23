@@ -1,5 +1,5 @@
 [package]
-name = "estaudio-fork-signalsmith-stretch"
+name = "est-audio-fork-signalsmith-stretch"
 description = "A custom fork of signalsmith-stretch-rs that use my own fork of signalsmith for audio processing."
 version = "0.1.5"
 edition = "2024"
