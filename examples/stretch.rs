@@ -84,8 +84,10 @@ where
 
     let sample_rate = output_config.sample_rate.0;
     let channels = output_config.channels;
-    let mut stretch = est_audio_fork_signalsmith_stretch::Stretch::preset_default(channels as u32, sample_rate);
-    stretch.set_transpose_factor_semitones(semitones, None);
+    
+    let mut stretch = est_audio_fork_signalsmith_stretch::Stretch::new();
+    stretch.preset_cheaper(channels as i32, sample_rate as f32, true);
+    stretch.set_transpose_semitoses(semitones, None);
 
     let mut input_buffer = Vec::new();
 
@@ -109,7 +111,7 @@ where
             }
 
             // Now we're ready to stretch.
-            stretch.process(&input_buffer, output);
+            stretch.process(&input_buffer, input_len as i32, output, output.len() as i32);
         },
         |err| eprintln!("an error occurred on stream: {}", err),
         None,
